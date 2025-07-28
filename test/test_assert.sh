@@ -15,7 +15,7 @@
 
 set -o nounset
 
-DIR_SRC="$( cd "$( dirname "${0}" )" && pwd )"
+DIR_SRC="$( cd "$( dirname "${0}" )/../src" && pwd )"
 
 source "$DIR_SRC/assert.sh"
 
