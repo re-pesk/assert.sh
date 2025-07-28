@@ -5,7 +5,7 @@
 Assert.sh is intended to give the assertion mechanism to shell scripts with well-known assert functions like `assert_eq`, `assert_array_eq`, or `assert_empty`.
 Inspired by [Assert class of JUnit](http://junit.sourceforge.net/javadoc/org/junit/Assert.html)
 
-### Install & Usage
+## Install & Usage
 
 ```sh
 > $ git clone https://github.com/torokmark/assert.sh.git; cd assert.sh
@@ -34,10 +34,10 @@ III. Now assert functions are available for use.
 ```sh
 assert_eq "hello" "world"
 ```
+
 > 0 return status is considered true and anything else is considered false.
 
-
-### List of assert functions
+## List of assert functions
 
 * `assert_eq` takes two strings and checks whether they are the same based on the character strings.
 * `assert_not_eq` is the opposite of `assert_eq`.
@@ -68,7 +68,6 @@ assert_eq "$expected" "$actual" "not equivalent!"
 # => x Hello == World :: not equivalent! 
 ```
 
-
 ```sh
 source "./assert.sh"
 
@@ -85,7 +84,3 @@ fi
 
 If the return status (`$?`) of `assert_eq` is equal to `0`, which is considered true according to the convention.
 If the assert function returns `1`, the expected and actual values are differred.
-
-
-
-
