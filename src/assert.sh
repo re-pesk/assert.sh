@@ -45,6 +45,11 @@ log_failure() {
   printf "${RED}✖ %s${NORMAL}\n" "$@" >&2
 }
 
+count_lines() {
+  wc -l << EOF
+$1
+EOF
+}
 
 assert_eq() {
   local expected="$1"
@@ -90,26 +95,24 @@ assert_false() {
 
 assert_array_eq() {
 
-  declare -a expected=("${!1-}")
-  # echo "AAE ${expected[@]}"
+  local expected="$1"
+  local expected_lines_no="$(count_lines "$expected")"
+  # echo "AAE ${expected}"
 
-  declare -a actual=("${!2}")
-  # echo "AAE ${actual[@]}"
+  local actual="$2"
+  local actual_lines_no="$(count_lines "$actual")"
+  # echo "AAE ${actual}"
 
   local msg="${3-}"
 
   local return_code=0
-  if [ ! "${#expected[@]}" == "${#actual[@]}" ]; then
+  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
     return_code=1
   fi
 
-  local i
-  for (( i=1; i < ${#expected[@]} + 1; i+=1 )); do
-    if [ ! "${expected[$i-1]}" == "${actual[$i-1]}" ]; then
-      return_code=1
-      break
-    fi
-  done
+  if [ ! "$expected" = "$actual" ]; then
+    return_code=1
+  fi
 
   if [ "$return_code" = 1 ]; then
     [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
@@ -120,25 +123,24 @@ assert_array_eq() {
 
 assert_array_not_eq() {
 
-  declare -a expected=("${!1-}")
-  declare -a actual=("${!2}")
+  local expected="$1"
+  local expected_lines_no="$(count_lines "$expected")"
   # echo "AAE ${expected}"
+
+  local actual="$2"
+  local actual_lines_no="$(count_lines "$actual")"
   # echo "AAE ${actual}"
 
   local msg="${3-}"
 
   local return_code=1
-  if [ ! "${#expected[@]}" == "${#actual[@]}" ]; then
+  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
     return_code=0
   fi
 
-  local i
-  for (( i=1; i < ${#expected[@]} + 1; i+=1 )); do
-    if [ ! "${expected[$i-1]}" == "${actual[$i-1]}" ]; then
-      return_code=0
-      break
-    fi
-  done
+  if [ ! "$expected" = "$actual" ]; then
+    return_code=0
+  fi
 
   if [ "$return_code" = 1 ]; then
     [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
