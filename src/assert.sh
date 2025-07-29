@@ -12,8 +12,10 @@
 ## Log methods : inspired by
 ##	- https://natelandau.com/bash-scripting-utilities/
 ## author: Mark Torok
-##
 ## date: 07. Dec. 2016
+## 
+## modified by: Rėdas Peškaitis
+## ISO date: 2025-07-30
 ##
 ## license: MIT
 ##
