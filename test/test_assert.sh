@@ -22,7 +22,7 @@ DIR_SRC="$( cd "$( dirname "${0}" )/../src" && pwd )"
 # shellcheck source=src/assert.sh
 source "$DIR_SRC/assert.sh"
 
-log_header "Test assert : test_assert.sh"
+log_header "Test assert : test_assert.bash"
 
 test_assert_eq() {
   log_header "Test :: assert_eq"
@@ -104,7 +104,7 @@ test_assert_array_eq() {
 
   exp=("one" "tw oo" "333")
   act=("one" "tw oo" "333")
-  assert_array_eq exp[@] act[@] "Should not be equal"
+  assert_array_eq "${exp[*]}" "${act[*]}" "Should not be equal"
   if [ "$?" == 0 ]; then
     log_success "assert_array_eq returns 0 if two arrays are equal by values"
   else
@@ -113,7 +113,7 @@ test_assert_array_eq() {
 
   exp=("one")
   act=("one" "tw oo" "333")
-  assert_array_eq exp[@] act[@]  # it can be an issue on other implementation of shell
+  assert_array_eq "${exp[*]}" "${act[*]}" # it can be an issue on other implementation of shell
   if [ "$?" == 1 ]; then
     log_success "assert_array_eq returns 1 if the lengths of the two arrays are not equal"
   else
@@ -122,7 +122,7 @@ test_assert_array_eq() {
 
   exp=("one" "222" "333")
   act=("one" "tw oo" "333")
-  assert_array_eq exp[@] act[@]
+  assert_array_eq "${exp[*]}" "${act[*]}"
   if [ "$?" == 1 ]; then
     log_success "assert_array_eq returns 1 if two arrays are not equal"
   else
@@ -131,13 +131,12 @@ test_assert_array_eq() {
 
   exp=()
   act=("one" "tw oo" "333")
-  assert_array_eq exp[@] act[@]
+  assert_array_eq "${exp[*]}" "${act[*]}"
   if [ "$?" == 1 ]; then
     log_success "assert_array_eq returns 1 if one array is empty"
   else
     log_failure "assert_array_eq should return 1"
   fi
-
 }
 
 test_assert_array_not_eq() {
@@ -148,7 +147,7 @@ test_assert_array_not_eq() {
 
   exp=("one" "tw oo" "333")
   act=("one" "tw oo" "333")
-  assert_array_not_eq exp[@] act[@]
+  assert_array_not_eq "${exp[*]}" "${act[*]}"
   if [ "$?" == 1 ]; then
     log_success "assert_array_not_eq returns 1 if two arrays are equal by values"
   else
@@ -157,7 +156,7 @@ test_assert_array_not_eq() {
 
   exp=("one")
   act=("one" "tw oo" "333")
-  assert_array_not_eq exp[@] act[@]  # it can be an issue on other implementation of shell
+  assert_array_not_eq "${exp[*]}" "${act[*]}"  # it can be an issue on other implementation of shell
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if the lengths of the two arrays are not equal"
   else
@@ -166,7 +165,7 @@ test_assert_array_not_eq() {
 
   exp=("one" "222" "333")
   act=("one" "tw oo" "333")
-  assert_array_not_eq exp[@] act[@]
+  assert_array_not_eq "${exp[*]}" "${act[*]}"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if two arrays are not equal"
   else
@@ -175,13 +174,12 @@ test_assert_array_not_eq() {
 
   exp=()
   act=("one" "tw oo" "333")
-  assert_array_not_eq exp[@] act[@]
+  assert_array_not_eq "${exp[*]}" "${act[*]}"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if one array is empty"
   else
     log_failure "assert_array_not_eq should return 0"
   fi
-
 }
 
 test_assert_empty() {
@@ -405,8 +403,6 @@ test_assert_gt() {
   else
     log_failure "assert_gt does not work"
   fi
-
-
 }
 
 test_assert_ge() {
@@ -457,8 +453,6 @@ test_assert_lt() {
   else
     log_failure "assert_lt does not work"
   fi
-
-
 }
 
 test_assert_le() {
@@ -485,8 +479,6 @@ test_assert_le() {
     log_failure "assert_le does not work"
   fi
 }
-
-
 
 # test calls
 
