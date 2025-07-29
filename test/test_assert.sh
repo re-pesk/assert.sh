@@ -15,9 +15,9 @@
 
 set -o nounset
 
-DIR_TESTS=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR_SRC="$( cd "$( dirname "${0}" )/../src" && pwd )"
 
-source "$DIR_TESTS/assert.sh"
+source "$DIR_SRC/assert.sh"
 
 log_header "Test assert : test_assert.sh"
 
