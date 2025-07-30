@@ -13,10 +13,13 @@
 ##
 #####################################################################
 
+# shellcheck disable=SC2034,SC2181
+
 set -o nounset
 
 DIR_SRC="$( cd "$( dirname "${0}" )/../src" && pwd )"
 
+# shellcheck source=src/assert.sh
 source "$DIR_SRC/assert.sh"
 
 log_header "Test assert : test_assert.sh"
@@ -501,4 +504,3 @@ test_assert_gt
 test_assert_ge
 test_assert_lt
 test_assert_le
-
