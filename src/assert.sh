@@ -19,7 +19,7 @@
 ##
 #####################################################################
 
-if command -v tput &>/dev/null && tty -s; then
+if command -v tput >/dev/null 2>&1 && tty -s; then
   RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
   MAGENTA=$(tput setaf 5)
@@ -51,7 +51,7 @@ assert_eq() {
   local actual="$2"
   local msg="${3-}"
 
-  if [ "$expected" == "$actual" ]; then
+  if [ "$expected" = "$actual" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$expected == $actual :: $msg" || true
@@ -64,7 +64,7 @@ assert_not_eq() {
   local actual="$2"
   local msg="${3-}"
 
-  if [ ! "$expected" == "$actual" ]; then
+  if [ ! "$expected" = "$actual" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$expected != $actual :: $msg" || true
@@ -111,8 +111,8 @@ assert_array_eq() {
     fi
   done
 
-  if [ "$return_code" == 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected[*]}) != (${actual[*]}) :: $msg" || true
+  if [ "$return_code" = 1 ]; then
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
   fi
 
   return "$return_code"
@@ -122,6 +122,8 @@ assert_array_not_eq() {
 
   declare -a expected=("${!1-}")
   declare -a actual=("${!2}")
+  # echo "AAE ${expected}"
+  # echo "AAE ${actual}"
 
   local msg="${3-}"
 
@@ -138,8 +140,8 @@ assert_array_not_eq() {
     fi
   done
 
-  if [ "$return_code" == 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected[*]}) == (${actual[*]}) :: $msg" || true
+  if [ "$return_code" = 1 ]; then
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
   fi
 
   return "$return_code"
@@ -174,7 +176,7 @@ assert_contain() {
     return 1;
   fi
 
-  if [ -z "${haystack##*$needle*}" ]; then
+  if [ -z "${haystack##*"$needle"*}" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$haystack doesn't contain $needle :: $msg" || true
@@ -195,7 +197,7 @@ assert_not_contain() {
     return 0;
   fi
 
-  if [ "${haystack##*$needle*}" ]; then
+  if [ "${haystack##*"$needle"*}" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$haystack contains $needle :: $msg" || true
@@ -208,7 +210,7 @@ assert_gt() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -gt  "$second" ]]; then
+  if [ "$first" -gt  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first > $second :: $msg" || true
@@ -221,7 +223,7 @@ assert_ge() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -ge  "$second" ]]; then
+  if [ "$first" -ge  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first >= $second :: $msg" || true
@@ -234,7 +236,7 @@ assert_lt() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -lt  "$second" ]]; then
+  if [ "$first" -lt  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first < $second :: $msg" || true
@@ -247,7 +249,7 @@ assert_le() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -le  "$second" ]]; then
+  if [ "$first" -le  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first <= $second :: $msg" || true
