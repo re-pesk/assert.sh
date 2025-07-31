@@ -53,6 +53,10 @@ $1
 EOF
 )
 
+array_to_string() (
+  echo "$(printf "%s=%s\n" "$@" | sort)"
+)
+
 assert_eq() (
   expected="$1"
   actual="$2"
@@ -96,13 +100,11 @@ assert_false() (
 )
 
 assert_array_eq() (
-  expected="$1"
+  expected="$(array_to_string $1)"
   expected_lines_no="$(count_lines "$expected")"
-  # echo "AAE ${expected}"
 
-  actual="$2"
+  actual="$(array_to_string $2)"
   actual_lines_no="$(count_lines "$actual")"
-  # echo "AAE ${actual}"
 
   msg="${3-}"
 
@@ -123,13 +125,11 @@ assert_array_eq() (
 )
 
 assert_array_not_eq() (
-  expected="$1"
+  expected="$(array_to_string $1)"
   expected_lines_no="$(count_lines "$expected")"
-  # echo "AAE ${expected}"
 
-  actual="$2"
+  actual="$(array_to_string $2)"
   actual_lines_no="$(count_lines "$actual")"
-  # echo "AAE ${actual}"
 
   msg="${3-}"
 
