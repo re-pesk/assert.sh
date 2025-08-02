@@ -53,6 +53,10 @@ $1
 EOF
 )
 
+current_shell() (
+  basename "$(ps -hp $$ | awk '{print $5}')"
+)
+
 assert_eq() (
   expected="$1"
   actual="$2"
@@ -104,20 +108,17 @@ assert_array_eq() (
 
   msg="${3-}"
 
-  return_code=0
   if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
-    return_code=1
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
+    return 1
   fi
 
   if [ ! "$expected" = "$actual" ]; then
-    return_code=1
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
+    return 1
   fi
 
-  if [ "$return_code" = 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
-  fi
-
-  return "$return_code"
+  return 0
 )
 
 assert_array_not_eq() (
@@ -129,20 +130,17 @@ assert_array_not_eq() (
 
   msg="${3-}"
 
-  return_code=1
   if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
-    return_code=0
+    return 0
   fi
 
   if [ ! "$expected" = "$actual" ]; then
-    return_code=0
+    return 0
   fi
 
-  if [ "$return_code" = 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
-  fi
+  [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
 
-  return "$return_code"
+  return 1
 )
 
 assert_empty() (
