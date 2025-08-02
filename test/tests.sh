@@ -18,3 +18,4 @@ DIR_TEST="$( cd "$( dirname "${0}" )" && pwd )"
 
 "$DIR_TEST/test_assert.bash"
 "$DIR_TEST/test_assert.dash"
+"$DIR_TEST/test_assert.zsh"
