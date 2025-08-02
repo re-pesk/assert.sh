@@ -26,7 +26,7 @@ git clone https://github.com/torokmark/assert.sh.git
 II. Edit the script where you would like to use asserts and paste the next line on the top:
 
 ```sh
-source './assert.sh'
+. './assert.sh'
 ```
 
 III. Now assert functions are available for use.
@@ -43,8 +43,8 @@ assert_eq "hello" "world"
 * `assert_not_eq` is the opposite of `assert_eq`.
 * `assert_true` takes a parameter and returns 0 confirming the parameter is true.
 * `assert_false` takes a parameter and decides whether it is false.
-* `assert_array_eq` takes two arrays and compare them by items.
-* `assert_array_not_eq` takes two arrays and return 0 if the items are not the same on the same index.
+* `assert_array_eq` takes two strings representing arrays and compares them.
+* `assert_array_not_eq` takes two strings representing arrays and return 0 if they are not the same.
 * `assert_empty` takes a string and returns 0 if it is empty
 * `assert_not_empty` is the opposite of `assert_empty`.
 * `assert_contain` checks whether the first argument contains the second one.
@@ -59,7 +59,7 @@ assert_eq "hello" "world"
 Example:
 
 ```sh
-source "./assert.sh"
+. "./src/assert.sh"
 
 local expected actual
 expected="Hello"
@@ -69,7 +69,7 @@ assert_eq "$expected" "$actual" "not equivalent!"
 ```
 
 ```sh
-source "./assert.sh"
+. "./src/assert.sh"
 
 local expected actual
 expected="Hello"
