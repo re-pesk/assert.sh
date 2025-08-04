@@ -21,6 +21,9 @@
 ##
 #####################################################################
 
+nl="
+"
+
 if command -v tput >/dev/null 2>&1 && tty -s; then
   RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
@@ -60,42 +63,38 @@ current_shell() (
 assert_eq() (
   expected="$1"
   actual="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-!=}"
 
-  if [ "$expected" = "$actual" ]; then
-    return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$expected == $actual :: $msg" || true
-    return 1
+  [ "$expected" = "$actual" ] && return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
   fi
+  return 1
 )
 
 assert_not_eq() (
   expected="$1"
   actual="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-==}"
 
-  if [ ! "$expected" = "$actual" ]; then
-    return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$expected != $actual :: $msg" || true
-    return 1
+  [ ! "$expected" = "$actual" ] && return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
   fi
+  return 1
 )
 
 assert_true() (
-  actual="$1"
-  msg="${2-}"
-
-  assert_eq true "$actual" "$msg"
+  assert_eq true "$@"
   return "$?"
 )
 
 assert_false() (
-  actual="$1"
-  msg="${2-}"
-
-  assert_eq false "$actual" "$msg"
+  assert_eq false "$@"
   return "$?"
 )
 
@@ -106,19 +105,19 @@ assert_array_eq() (
   actual="$2"
   actual_lines_no="$(count_lines "$actual")"
 
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-!=}"
 
-  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
-    return 1
+  if [ "$expected_lines_no" -eq "$actual_lines_no" ] && [ "${expected}" = "${actual}" ]; then
+    return 0
   fi
 
-  if [ ! "$expected" = "$actual" ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
-    return 1
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
   fi
 
-  return 0
+  return 1
 )
 
 assert_array_not_eq() (
@@ -128,34 +127,28 @@ assert_array_not_eq() (
   actual="$2"
   actual_lines_no="$(count_lines "$actual")"
 
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-==}"
 
-  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
+  if [ ! "$expected_lines_no" -eq "$actual_lines_no" ] || [ ! "$expected" = "$actual" ]; then 
     return 0
   fi
 
-  if [ ! "$expected" = "$actual" ]; then
-    return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
   fi
-
-  [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
 
   return 1
 )
 
 assert_empty() (
-  actual=$1
-  msg="${2-}"
-
-  assert_eq "" "$actual" "$msg"
+  assert_eq "" "$@"
   return "$?"
 )
 
 assert_not_empty() (
-  actual=$1
-  msg="${2-}"
-
-  assert_not_eq "" "$actual" "$msg"
+  assert_not_eq "" "$@"
   return "$?"
 )
 
@@ -163,6 +156,8 @@ assert_contain() (
   haystack="$1"
   needle="${2-}"
   msg="${3-}"
+  label="${3-}"
+  msg="${4-doesn\'t contain}"
 
   if [ -z "${needle:+x}" ]; then
     return 0;
@@ -174,16 +169,19 @@ assert_contain() (
 
   if [ -z "${haystack##*"$needle"*}" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$haystack doesn't contain $needle :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$haystack'${nl}${msg}${nl}'$needle'" || true
+  fi
+  return 1
 )
 
 assert_not_contain() (
   haystack="$1"
   needle="${2-}"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-contains}"
 
   if [ -z "${needle:+x}" ]; then
     return 0;
@@ -195,60 +193,75 @@ assert_not_contain() (
 
   if [ "${haystack##*"$needle"*}" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$haystack contains $needle :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$haystack'${nl}${msg}${nl}'$needle'" || true
+  fi
+  return 1
 )
 
 assert_gt() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4->}"
 
   if [ "$first" -gt  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first > $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_ge() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4->=}"
 
   if [ "$first" -ge  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first >= $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_lt() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-<}"
 
   if [ "$first" -lt  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first < $second :: $msg" || true
-    return 1
   fi
+
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_le() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-<=}"
 
   if [ "$first" -le  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first <= $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+  fi
+  return 1
 )

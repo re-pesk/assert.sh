@@ -29,7 +29,7 @@ log_header "Test assert : test_assert.bash"
 test_assert_eq() {
   log_header "Test :: assert_eq"
 
-  assert_eq "Hello" "Hello"
+  assert_eq "Hello" "Hello" "Error in 'test_assert_eq (1)'" "is not equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_eq returns 0 if two words are equal"
   else
@@ -54,7 +54,7 @@ test_assert_not_eq() {
     log_failure "assert_not_eq should return 1"
   fi
 
-  assert_not_eq "Hello" "World"
+  assert_not_eq "Hello" "World" "Error in 'test_assert_not_eq (2)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_not_eq returns 0 if two params are not equal"
   else
@@ -65,7 +65,7 @@ test_assert_not_eq() {
 test_assert_true() {
   log_header "Test :: assert_true"
 
-  assert_true true
+  assert_true true "Error in 'test_assert_true (1)'" "is not true"
   if [ "$?" == 0 ]; then
     log_success "assert_true returns 0 if param is true"
   else
@@ -83,7 +83,7 @@ test_assert_true() {
 test_assert_false() {
   log_header "Test :: assert_false"
 
-  assert_false false
+  assert_false false "Error in 'test_assert_false (1)'" "is true"
   if [ "$?" == 0 ]; then
     log_success "assert_false returns 0 if param is false"
   else
@@ -106,7 +106,7 @@ test_assert_array_eq() {
 
   exp=("one" "tw oo" "333")
   act=("one" "tw oo" "333")
-  assert_array_eq "${exp[*]@K}" "${act[*]@K}" "Should not be equal"
+  assert_array_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_array_eq (1)'" "is not equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_eq returns 0 if two arrays are equal by values"
   else
@@ -115,7 +115,7 @@ test_assert_array_eq() {
 
   exp=("one")
   act=("one" "tw oo" "333")
-  assert_array_eq "${exp[*]@K}" "${act[*]@K}" # it can be an issue on other implementation of shell
+  assert_array_eq "${exp[*]@K}" "${act[*]@K}"
   if [ "$?" == 1 ]; then
     log_success "assert_array_eq returns 1 if the lengths of the two arrays are not equal"
   else
@@ -158,7 +158,7 @@ test_assert_array_not_eq() {
 
   exp=("one")
   act=("one" "tw oo" "333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"  # it can be an issue on other implementation of shell
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_array_not_eq (2)'" 'is equal to'
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if the lengths of the two arrays are not equal"
   else
@@ -167,7 +167,7 @@ test_assert_array_not_eq() {
 
   exp=("one" "222" "333")
   act=("one" "tw oo" "333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_array_not_eq (3)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if two arrays are not equal"
   else
@@ -176,7 +176,7 @@ test_assert_array_not_eq() {
 
   exp=()
   act=("one" "tw oo" "333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_array_not_eq (4)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if one array is empty"
   else
@@ -192,7 +192,7 @@ test_assert_assoc_array_eq() {
 
   exp=([a]="one" [b]="tw oo" [c]="333")
   act=([a]="one" [b]="tw oo" [c]="333")
-  assert_array_eq "${exp[*]@K}" "${act[*]@K}"  "Should not be equal"
+  assert_array_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_assoc_array_eq (1)'" "is not equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_eq returns 0 if two associative arrays are equal by values"
   else
@@ -244,7 +244,7 @@ test_assert_assoc_array_not_eq() {
 
   exp=([a]="one")
   act=([a]="one" [b]="tw oo" [c]="333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"  # it can be an issue on other implementation of shell
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_assoc_array_not_eq (2)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if the lengths of the two associative arrays are not equal"
   else
@@ -253,7 +253,7 @@ test_assert_assoc_array_not_eq() {
 
   exp=([a]="one" [b]="222" [c]="333")
   act=([a]="one" [b]="tw oo" [c]="333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_assoc_array_not_eq (3)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if two arrays are not equal"
   else
@@ -262,7 +262,7 @@ test_assert_assoc_array_not_eq() {
 
   exp=()
   act=([a]="one" [b]="tw oo" [c]="333")
-  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}"
+  assert_array_not_eq "${exp[*]@K}" "${act[*]@K}" "Error in 'test_assert_assoc_array_not_eq (4)'" "is equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_array_not_eq returns 0 if one associative array is empty"
   else
@@ -273,7 +273,7 @@ test_assert_assoc_array_not_eq() {
 test_assert_empty() {
   log_header "Test :: assert_empty"
 
-  assert_empty ""
+  assert_empty "" "Error in 'test_assert_empty (1)'" "is not empty"
   if [ "$?" == 0 ]; then
     log_success "assert_empty returns 0 if param is empty string"
   else
@@ -298,14 +298,14 @@ test_assert_empty() {
 test_assert_not_empty() {
   log_header "Test :: assert_not_empty"
 
-  assert_not_empty "some text"
+  assert_not_empty "some text" "Error in 'test_assert_not_empty (1)'" "is empty"
   if [ "$?" == 0 ]; then
     log_success "assert_not_empty returns 0 if param is some text string"
   else
     log_failure "assert_not_empty does not work"
   fi
 
-  assert_not_empty "\n"
+  assert_not_empty "\n" "Error in 'test_assert_not_empty (2)'" "is empty"
   if [ "$?" == 0 ]; then
     log_success "assert_not_empty returns 0 if param is some white space"
   else
@@ -337,42 +337,42 @@ test_assert_contain() {
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "haystack" "stack"
+  assert_contain "haystack" "stack" "Error in 'test_assert_contain (3)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the haystack ends in the needle"
   else
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "haystack" "hay"
+  assert_contain "haystack" "hay" "Error in 'test_assert_contain (4)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the haystack starts with the needle"
   else
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "haystack" "aysta"
+  assert_contain "haystack" "aysta" "Error in 'test_assert_contain (5)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the needle is somewhere in the middle of the haystack"
   else
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "foo\nbar\nhello\nworld" "foo"
+  assert_contain "foo\nbar\nhello\nworld" "foo" "Error in 'test_assert_contain (6)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the needle matches the first haystack line"
   else
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "foo\nbar\nhello\nworld" "bar"
+  assert_contain "foo\nbar\nhello\nworld" "bar" "Error in 'test_assert_contain (7)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the needle matches the second haystack line"
   else
     log_failure "assert_contain does not work"
   fi
 
-  assert_contain "foo\nbar\nhello\nworld" "ell"
+  assert_contain "foo\nbar\nhello\nworld" "ell" "Error in 'test_assert_contain (8)'" "doesn't contain"
   if [ "$?" == 0 ]; then
     log_success "assert_contain returns 0 if the needle is on the third haystack line"
   else
@@ -397,7 +397,7 @@ test_assert_contain() {
 test_assert_not_contain() {
   log_header "Test :: assert_not_contain"
 
-  assert_not_contain "haystack" "needle"
+  assert_not_contain "haystack" "needle" "Error in 'test_assert_not_contain (1)'" "contains"
   if [ "$?" == 0 ]; then
     log_success "assert_not_contain returns 0 if the needle is not in the haystack"
   else
@@ -453,14 +453,14 @@ test_assert_not_contain() {
     log_failure "assert_not_contain does not work"
   fi
 
-  assert_not_contain "foo\nbar\nhello\nworld" "barbecue"
+  assert_not_contain "foo\nbar\nhello\nworld" "barbecue" "Error in 'test_assert_not_contain (9)'" "contains"
   if [ "$?" == 0 ]; then
     log_success "assert_not_contain returns 0 if the needle is not in a multi-line haystack"
   else
     log_failure "assert_not_contain does not work"
   fi
 
-  assert_not_contain "" "needle"
+  assert_not_contain "" "needle" "Error in 'test_assert_not_contain (10)'" "contains"
   if [ "$?" == 0 ]; then
     log_success "assert_not_contain returns 0 if the haystack is empty"
   else
@@ -471,21 +471,21 @@ test_assert_not_contain() {
 test_assert_gt() {
   log_header "Test :: assert_gt"
 
-  assert_gt 1 2 
+  assert_gt 1 2
   if [ "$?" == 1 ]; then
     log_success "assert_gt returns 1 if second param is greater than first param"
   else
     log_failure "assert_gt does not work"
   fi
 
-  assert_gt 2 -1 
+  assert_gt 2 -1 "Error in 'test_assert_gt (2)'" "is not greater than"
   if [ "$?" == 0 ]; then
     log_success "assert_gt returns 0 if first param is greater than second param"
   else
     log_failure "assert_gt does not work"
   fi
 
-  assert_gt 2 2 
+  assert_gt 2 2
   if [ "$?" == 1 ]; then
     log_success "assert_gt returns 1 if two params are equal"
   else
@@ -496,21 +496,21 @@ test_assert_gt() {
 test_assert_ge() {
   log_header "Test :: assert_ge"
 
-  assert_ge 1 1
+  assert_ge 1 1 "Error in 'test_assert_ge (1)'" "is neither greater than nor equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_ge returns 0 if two params are equal"
   else
     log_failure "assert_ge does not work"
   fi
 
-  assert_ge 1 2 
+  assert_ge 1 2
   if [ "$?" == 1 ]; then
     log_success "assert_ge returns 1 if second param is greater than first param"
   else
     log_failure "assert_ge does not work"
   fi
 
-  assert_ge 2 -1 
+  assert_ge 2 -1 "Error in 'test_assert_ge (3)'" "is neither greater than nor equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_ge returns 0 if first param is greater than second param"
   else
@@ -521,21 +521,21 @@ test_assert_ge() {
 test_assert_lt() {
   log_header "Test :: assert_lt"
 
-  assert_lt 2 1 
+  assert_lt 2 1
   if [ "$?" == 1 ]; then
     log_success "assert_lt returns 1 if second param is less than first param"
   else
     log_failure "assert_lt does not work"
   fi
 
-  assert_lt -2 1
+  assert_lt -2 1 "Error in 'test_assert_lt (2)'" "is not less than"
   if [ "$?" == 0 ]; then
     log_success "assert_lt returns 0 if first param is less than second param"
   else
     log_failure "assert_lt does not work"
   fi
 
-  assert_lt 2 2 
+  assert_lt 2 2
   if [ "$?" == 1 ]; then
     log_success "assert_lt returns 1 if two params are equal"
   else
@@ -546,7 +546,7 @@ test_assert_lt() {
 test_assert_le() {
   log_header "Test :: assert_le"
 
-  assert_le 1 1
+  assert_le 1 1 "Error in 'test_assert_le (1)'" "is neither less than nor equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_le returns 0 if two params are equal"
   else
@@ -560,7 +560,7 @@ test_assert_le() {
     log_failure "assert_le does not work"
   fi
 
-  assert_le -2 1
+  assert_le -2 1 "Error in 'test_assert_le (3)'" "is neither less than nor equal to"
   if [ "$?" == 0 ]; then
     log_success "assert_le returns 0 if first param is less than second param"
   else
