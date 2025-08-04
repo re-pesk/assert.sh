@@ -67,7 +67,7 @@ assert_eq() (
   [ "$expected" = "$actual" ] && return 0
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
   return 1
 )
@@ -81,7 +81,7 @@ assert_not_eq() (
   [ ! "$expected" = "$actual" ] && return 0
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
   return 1
 )
@@ -112,7 +112,7 @@ assert_array_eq() (
 
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
 
   return 1
@@ -134,7 +134,7 @@ assert_array_not_eq() (
 
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$actual'${nl}${msg}${nl}'$expected'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
 
   return 1
@@ -170,7 +170,7 @@ assert_contain() (
   fi
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$haystack'${nl}${msg}${nl}'$needle'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$haystack'${nl}${nl}${msg}${nl}${nl}'$needle'" || true
   fi
   return 1
 )
@@ -194,7 +194,7 @@ assert_not_contain() (
   fi
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$haystack'${nl}${msg}${nl}'$needle'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$haystack'${nl}${nl}${msg}${nl}${nl}'$needle'" || true
   fi
   return 1
 )
@@ -210,7 +210,7 @@ assert_gt() (
   fi
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
   fi
   return 1
 )
@@ -226,7 +226,7 @@ assert_ge() (
   fi
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
   fi
   return 1
 )
@@ -243,7 +243,7 @@ assert_lt() (
 
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
   fi
   return 1
 )
@@ -259,7 +259,7 @@ assert_le() (
   fi
   if [ "${#label}" -gt 0 ]; then
     [ "${label}" = "--" ] && label=""
-    log_failure "${label:+${label}:${nl}}'$first'${nl}${msg}${nl}'$second'" || true
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
   fi
   return 1
 )
