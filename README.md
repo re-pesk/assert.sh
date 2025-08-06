@@ -45,6 +45,8 @@ assert_eq "hello" "world"
 * `assert_false` takes a parameter and decides whether it is false.
 * `assert_array_eq` takes two strings representing arrays and compares them.
 * `assert_array_not_eq` takes two strings representing arrays and return 0 if they are not the same.
+* `assert_assoc_array_eq` takes two strings representing associative arrays and compare them.
+* `assert_assoc_array_not_eq` takes two strings representing associative arrays and return 0 if they are not the same.
 * `assert_empty` takes a string and returns 0 if it is empty
 * `assert_not_empty` is the opposite of `assert_empty`.
 * `assert_contain` checks whether the first argument contains the second one.

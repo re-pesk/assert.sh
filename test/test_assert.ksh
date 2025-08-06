@@ -184,6 +184,92 @@ test_assert_array_not_eq() {
   fi
 }
 
+test_assert_assoc_array_eq() {
+  log_header "Test :: assert_array_eq (with associative arrays)"
+
+  typeset -A exp
+  typeset -A act
+
+  exp=([a]="one" [b]="tw oo" [c]="333")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"  "Should not be equal"
+  if [ "$?" == 0 ]; then
+    log_success "assert_array_eq returns 0 if two associative arrays are equal by values"
+  else
+    log_failure "assert_array_eq should return 0"
+  fi
+
+  exp=([a]="one")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}" # it can be an issue on other implementation of shell
+  if [ "$?" == 1 ]; then
+    log_success "assert_array_eq returns 1 if the lengths of the two associative arrays are not equal"
+  else
+    log_failure "assert_array_eq should return 1"
+  fi
+
+  exp=([a]="one" [b]="222" [c]="333")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"
+  if [ "$?" == 1 ]; then
+    log_success "assert_array_eq returns 1 if two associative arrays are not equal"
+  else
+    log_failure "assert_array_eq should return 1"
+  fi
+
+  exp=()
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"
+  if [ "$?" == 1 ]; then
+    log_success "assert_array_eq returns 1 if one associative array is empty"
+  else
+    log_failure "assert_array_eq should return 1"
+  fi
+}
+
+test_assert_assoc_array_not_eq() {
+  log_header "Test :: assert_array_not_eq (with associative arrays)"
+
+  typeset -A exp
+  typeset -A act
+
+  exp=([a]="one" [b]="tw oo" [c]="333")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_not_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"
+  if [ "$?" == 1 ]; then
+    log_success "assert_array_not_eq returns 1 if two associative arrays are equal by values"
+  else
+    log_failure "assert_array_not_eq should return 1"
+  fi
+
+  exp=([a]="one")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_not_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"  # it can be an issue on other implementation of shell
+  if [ "$?" == 0 ]; then
+    log_success "assert_array_not_eq returns 0 if the lengths of the two associative arrays are not equal"
+  else
+    log_failure "assert_array_not_eq should return 0"
+  fi
+
+  exp=([a]="one" [b]="222" [c]="333")
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_not_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"
+  if [ "$?" == 0 ]; then
+    log_success "assert_array_not_eq returns 0 if two arrays are not equal"
+  else
+    log_failure "assert_array_not_eq should return 0"
+  fi
+
+  exp=()
+  act=([a]="one" [b]="tw oo" [c]="333")
+  assert_array_not_eq "${!exp[*]} ${exp[*]}" "${!act[*]} ${act[*]}"
+  if [ "$?" == 0 ]; then
+    log_success "assert_array_not_eq returns 0 if one associative array is empty"
+  else
+    log_failure "assert_array_not_eq should return 0"
+  fi
+}
+
 test_assert_empty() {
   log_header "Test :: assert_empty"
 
@@ -484,17 +570,23 @@ test_assert_le() {
 
 # test calls
 
-test_assert_eq
-test_assert_not_eq
-test_assert_true
-test_assert_false
-test_assert_array_eq
-test_assert_array_not_eq
-test_assert_empty
-test_assert_not_empty
-test_assert_contain
-test_assert_not_contain
-test_assert_gt
-test_assert_ge
-test_assert_lt
-test_assert_le
+tests() {
+  test_assert_eq
+  test_assert_not_eq
+  test_assert_true
+  test_assert_false
+  test_assert_array_eq
+  test_assert_array_not_eq
+  test_assert_assoc_array_eq
+  test_assert_assoc_array_not_eq
+  test_assert_empty
+  test_assert_not_empty
+  test_assert_contain
+  test_assert_not_contain
+  test_assert_gt
+  test_assert_ge
+  test_assert_lt
+  test_assert_le
+}
+
+tests
