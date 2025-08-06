@@ -23,29 +23,46 @@ nl="
 "
 
 if command -v tput >/dev/null 2>&1 && tty -s; then
-  RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
-  MAGENTA=$(tput setaf 5)
-  NORMAL=$(tput sgr0)
+  DEFAULT=$(tput sgr0)
   BOLD=$(tput bold)
+  FG_BLACK=$(tput setaf 0)
+  FG_RED=$(tput setaf 1)
+  FG_GREEN=$(tput setaf 2)
+  FG_YELLOW=$(tput setaf 3)
+  FG_BLUE=$(tput setaf 4)
+  FG_MAGENTA=$(tput setaf 5)
+  FG_CYAN=$(tput setaf 6)
+  FG_WHITE=$(tput setaf 7)
+  HEADER=${BOLD}${FG_MAGENTA}
+  SUCCESS=${FG_GREEN}
+  FAILURE=${FG_RED}
+
 else
-  RED=$(echo -en "\e[31m")
-  GREEN=$(echo -en "\e[32m")
-  MAGENTA=$(echo -en "\e[35m")
-  NORMAL=$(echo -en "\e[00m")
-  BOLD=$(echo -en "\e[01m")
+  DEFAULT=$(printf "\e[00m")
+  BOLD=$(printf "\e[01m")
+  FG_BLACK=$(printf "\e[30m")
+  FG_RED=$(printf "\e[31m")
+  FG_GREEN=$(printf "\e[32m")
+  FG_YELLOW=$(printf "\e[33m")
+  FG_BLUE=$(printf "\e[34m")
+  FG_MAGENTA=$(printf "\e[35m")
+  FG_CYAN=$(printf "\e[36m")
+  FG_WHITE=$(printf "\e[37m")
+  HEADER=${BOLD}${FG_MAGENTA}
+  SUCCESS=${FG_GREEN}
+  FAILURE=${FG_RED}
 fi
 
 log_header() (
-  printf "\n${BOLD}${MAGENTA}==========  %s  ==========${NORMAL}\n" "$@" >&2
+  printf "\n${HEADER}==========  %s  ==========${DEFAULT}\n" "$@" >&2
 )
 
 log_success() (
-  printf "${GREEN}✔ %s${NORMAL}\n" "$@" >&2
+  printf "${SUCCESS}✔ %s${DEFAULT}\n" "$@" >&2
 )
 
 log_failure() (
-  printf "${RED}✖ %s${NORMAL}\n" "$@" >&2
+  printf "${FAILURE}✖ %s${DEFAULT}\n" "$@" >&2
 )
 
 count_lines() (
