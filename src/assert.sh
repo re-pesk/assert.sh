@@ -12,14 +12,16 @@
 ## Log methods : inspired by
 ##	- https://natelandau.com/bash-scripting-utilities/
 ## author: Mark Torok
-##
 ## date: 07. Dec. 2016
+## 
+## modified by: Rėdas Peškaitis
+## ISO date: 2025-07-30
 ##
 ## license: MIT
 ##
 #####################################################################
 
-if command -v tput &>/dev/null && tty -s; then
+if command -v tput >/dev/null 2>&1 && tty -s; then
   RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
   MAGENTA=$(tput setaf 5)
@@ -45,13 +47,18 @@ log_failure() {
   printf "${RED}✖ %s${NORMAL}\n" "$@" >&2
 }
 
+count_lines() {
+  wc -l << EOF
+$1
+EOF
+}
 
 assert_eq() {
   local expected="$1"
   local actual="$2"
   local msg="${3-}"
 
-  if [ "$expected" == "$actual" ]; then
+  if [ "$expected" = "$actual" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$expected == $actual :: $msg" || true
@@ -64,7 +71,7 @@ assert_not_eq() {
   local actual="$2"
   local msg="${3-}"
 
-  if [ ! "$expected" == "$actual" ]; then
+  if [ ! "$expected" = "$actual" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$expected != $actual :: $msg" || true
@@ -90,29 +97,27 @@ assert_false() {
 
 assert_array_eq() {
 
-  declare -a expected=("${!1-}")
-  # echo "AAE ${expected[@]}"
+  local expected="$1"
+  local expected_lines_no="$(count_lines "$expected")"
+  # echo "AAE ${expected}"
 
-  declare -a actual=("${!2}")
-  # echo "AAE ${actual[@]}"
+  local actual="$2"
+  local actual_lines_no="$(count_lines "$actual")"
+  # echo "AAE ${actual}"
 
   local msg="${3-}"
 
   local return_code=0
-  if [ ! "${#expected[@]}" == "${#actual[@]}" ]; then
+  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
     return_code=1
   fi
 
-  local i
-  for (( i=1; i < ${#expected[@]} + 1; i+=1 )); do
-    if [ ! "${expected[$i-1]}" == "${actual[$i-1]}" ]; then
-      return_code=1
-      break
-    fi
-  done
+  if [ ! "$expected" = "$actual" ]; then
+    return_code=1
+  fi
 
-  if [ "$return_code" == 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected[*]}) != (${actual[*]}) :: $msg" || true
+  if [ "$return_code" = 1 ]; then
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
   fi
 
   return "$return_code"
@@ -120,26 +125,27 @@ assert_array_eq() {
 
 assert_array_not_eq() {
 
-  declare -a expected=("${!1-}")
-  declare -a actual=("${!2}")
+  local expected="$1"
+  local expected_lines_no="$(count_lines "$expected")"
+  # echo "AAE ${expected}"
+
+  local actual="$2"
+  local actual_lines_no="$(count_lines "$actual")"
+  # echo "AAE ${actual}"
 
   local msg="${3-}"
 
   local return_code=1
-  if [ ! "${#expected[@]}" == "${#actual[@]}" ]; then
+  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
     return_code=0
   fi
 
-  local i
-  for (( i=1; i < ${#expected[@]} + 1; i+=1 )); do
-    if [ ! "${expected[$i-1]}" == "${actual[$i-1]}" ]; then
-      return_code=0
-      break
-    fi
-  done
+  if [ ! "$expected" = "$actual" ]; then
+    return_code=0
+  fi
 
-  if [ "$return_code" == 1 ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected[*]}) == (${actual[*]}) :: $msg" || true
+  if [ "$return_code" = 1 ]; then
+    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
   fi
 
   return "$return_code"
@@ -174,7 +180,7 @@ assert_contain() {
     return 1;
   fi
 
-  if [ -z "${haystack##*$needle*}" ]; then
+  if [ -z "${haystack##*"$needle"*}" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$haystack doesn't contain $needle :: $msg" || true
@@ -195,7 +201,7 @@ assert_not_contain() {
     return 0;
   fi
 
-  if [ "${haystack##*$needle*}" ]; then
+  if [ "${haystack##*"$needle"*}" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$haystack contains $needle :: $msg" || true
@@ -208,7 +214,7 @@ assert_gt() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -gt  "$second" ]]; then
+  if [ "$first" -gt  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first > $second :: $msg" || true
@@ -221,7 +227,7 @@ assert_ge() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -ge  "$second" ]]; then
+  if [ "$first" -ge  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first >= $second :: $msg" || true
@@ -234,7 +240,7 @@ assert_lt() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -lt  "$second" ]]; then
+  if [ "$first" -lt  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first < $second :: $msg" || true
@@ -247,7 +253,7 @@ assert_le() {
   local second="$2"
   local msg="${3-}"
 
-  if [[ "$first" -le  "$second" ]]; then
+  if [ "$first" -le  "$second" ]; then
     return 0
   else
     [ "${#msg}" -gt 0 ] && log_failure "$first <= $second :: $msg" || true
