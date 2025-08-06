@@ -1,15 +1,14 @@
 # assert.sh
 
-[![Build Status](https://travis-ci.com/torokmark/assert.sh.svg?branch=master)](https://travis-ci.com/torokmark/assert.sh)
+Assert.sh is intended to give the assertion mechanism to shell scripts with well-known assert functions like `assert_eq`, `assert_array_eq`, or `assert_empty`. Inspired by [Assert class of JUnit](http://junit.sourceforge.net/javadoc/org/junit/Assert.html).
 
-Assert.sh is intended to give the assertion mechanism to shell scripts with well-known assert functions like `assert_eq`, `assert_array_eq`, or `assert_empty`.
-Inspired by [Assert class of JUnit](http://junit.sourceforge.net/javadoc/org/junit/Assert.html)
+Assert.sh is written in pure POSIX shell and has no dependencies. It is tested on dash, yash, bash, zsh, ksh93u+m, and osh.
 
 ## Install & Usage
 
 ```sh
-> $ git clone https://github.com/torokmark/assert.sh.git; cd assert.sh
-> $ source assert.sh
+> $ git clone https://github.com/re-pesk/assert.sh.git
+> $ . "assert.sh/src/assert.sh"
 > $ assert_eq "hello" "world"
 > $ echo "$?"
 # => 1
@@ -18,7 +17,7 @@ Inspired by [Assert class of JUnit](http://junit.sourceforge.net/javadoc/org/jun
 I. Clone the repository
 
 ```sh
-git clone https://github.com/torokmark/assert.sh.git
+git clone https://github.com/re-pesk/assert.sh.git
 ```
 
 > Or copy the assert.sh where your project is located.
@@ -26,13 +25,13 @@ git clone https://github.com/torokmark/assert.sh.git
 II. Edit the script where you would like to use asserts and paste the next line on the top:
 
 ```sh
-. './assert.sh'
+. "assert.sh/src/assert.sh"
 ```
 
 III. Now assert functions are available for use.
 
 ```sh
-assert_eq "hello" "world"
+assert_eq "hello" "world" "Error in 'test_function_name'" "is not equal to"
 ```
 
 > 0 return status is considered true and anything else is considered false.
@@ -58,26 +57,36 @@ assert_eq "hello" "world"
 
 ### How to write tests
 
-Example:
+#### Example 1
 
 ```sh
-. "./src/assert.sh"
+. "assert.sh/src/assert.sh"
 
 local expected actual
 expected="Hello"
 actual="World!"
-assert_eq "$expected" "$actual" "not equivalent!"
-# => x Hello == World :: not equivalent! 
+assert_eq "$expected" "$actual" "Error in 'test no1'" "is not equal to"
 ```
 
+Output
+
+```plain
+✖ Error in 'Test no1':
+'Hello'
+is not equal to
+'World'!
+```
+
+#### Example 2
+
 ```sh
-. "./src/assert.sh"
+. "assert.sh/src/assert.sh"
 
 local expected actual
 expected="Hello"
 actual="Hello"
 assert_eq "$expected" "$actual"
-if [ "$?" == 0 ]; then
+if [ "$?" -eq 0 ]; then
   log_success "assert_eq returns 0 if two words are equal"
 else
   log_failure "assert_eq should return 0"

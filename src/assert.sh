@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #####################################################################
 ##
 ## title: Assert Extension
@@ -21,30 +19,50 @@
 ##
 #####################################################################
 
+nl="
+"
+
 if command -v tput >/dev/null 2>&1 && tty -s; then
-  RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
-  MAGENTA=$(tput setaf 5)
-  NORMAL=$(tput sgr0)
+  DEFAULT=$(tput sgr0)
   BOLD=$(tput bold)
+  FG_BLACK=$(tput setaf 0)
+  FG_RED=$(tput setaf 1)
+  FG_GREEN=$(tput setaf 2)
+  FG_YELLOW=$(tput setaf 3)
+  FG_BLUE=$(tput setaf 4)
+  FG_MAGENTA=$(tput setaf 5)
+  FG_CYAN=$(tput setaf 6)
+  FG_WHITE=$(tput setaf 7)
+  HEADER=${BOLD}${FG_MAGENTA}
+  SUCCESS=${FG_GREEN}
+  FAILURE=${FG_RED}
+
 else
-  RED=$(echo -en "\e[31m")
-  GREEN=$(echo -en "\e[32m")
-  MAGENTA=$(echo -en "\e[35m")
-  NORMAL=$(echo -en "\e[00m")
-  BOLD=$(echo -en "\e[01m")
+  DEFAULT=$(printf "\e[00m")
+  BOLD=$(printf "\e[01m")
+  FG_BLACK=$(printf "\e[30m")
+  FG_RED=$(printf "\e[31m")
+  FG_GREEN=$(printf "\e[32m")
+  FG_YELLOW=$(printf "\e[33m")
+  FG_BLUE=$(printf "\e[34m")
+  FG_MAGENTA=$(printf "\e[35m")
+  FG_CYAN=$(printf "\e[36m")
+  FG_WHITE=$(printf "\e[37m")
+  HEADER=${BOLD}${FG_MAGENTA}
+  SUCCESS=${FG_GREEN}
+  FAILURE=${FG_RED}
 fi
 
 log_header() (
-  printf "\n${BOLD}${MAGENTA}==========  %s  ==========${NORMAL}\n" "$@" >&2
+  printf "\n${HEADER}==========  %s  ==========${DEFAULT}\n" "$@" >&2
 )
 
 log_success() (
-  printf "${GREEN}✔ %s${NORMAL}\n" "$@" >&2
+  printf "${SUCCESS}✔ %s${DEFAULT}\n" "$@" >&2
 )
 
 log_failure() (
-  printf "${RED}✖ %s${NORMAL}\n" "$@" >&2
+  printf "${FAILURE}✖ %s${DEFAULT}\n" "$@" >&2
 )
 
 count_lines() (
@@ -60,42 +78,38 @@ current_shell() (
 assert_eq() (
   expected="$1"
   actual="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-!=}"
 
-  if [ "$expected" = "$actual" ]; then
-    return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$expected == $actual :: $msg" || true
-    return 1
+  [ "$expected" = "$actual" ] && return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
+  return 1
 )
 
 assert_not_eq() (
   expected="$1"
   actual="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-==}"
 
-  if [ ! "$expected" = "$actual" ]; then
-    return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$expected != $actual :: $msg" || true
-    return 1
+  [ ! "$expected" = "$actual" ] && return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
+  return 1
 )
 
 assert_true() (
-  actual="$1"
-  msg="${2-}"
-
-  assert_eq true "$actual" "$msg"
+  assert_eq true "$@"
   return "$?"
 )
 
 assert_false() (
-  actual="$1"
-  msg="${2-}"
-
-  assert_eq false "$actual" "$msg"
+  assert_eq false "$@"
   return "$?"
 )
 
@@ -106,19 +120,19 @@ assert_array_eq() (
   actual="$2"
   actual_lines_no="$(count_lines "$actual")"
 
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-!=}"
 
-  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
-    return 1
+  if [ "$expected_lines_no" -eq "$actual_lines_no" ] && [ "${expected}" = "${actual}" ]; then
+    return 0
   fi
 
-  if [ ! "$expected" = "$actual" ]; then
-    [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg"
-    return 1
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
 
-  return 0
+  return 1
 )
 
 assert_array_not_eq() (
@@ -128,34 +142,28 @@ assert_array_not_eq() (
   actual="$2"
   actual_lines_no="$(count_lines "$actual")"
 
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-==}"
 
-  if [ ! "$expected_lines_no" = "$actual_lines_no" ]; then
+  if [ ! "$expected_lines_no" -eq "$actual_lines_no" ] || [ ! "$expected" = "$actual" ]; then 
     return 0
   fi
 
-  if [ ! "$expected" = "$actual" ]; then
-    return 0
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$actual'${nl}${nl}${msg}${nl}${nl}'$expected'" || true
   fi
-
-  [ "${#msg}" -gt 0 ] && log_failure "(${expected}) != (${actual}) :: $msg" || true
 
   return 1
 )
 
 assert_empty() (
-  actual=$1
-  msg="${2-}"
-
-  assert_eq "" "$actual" "$msg"
+  assert_eq "" "$@"
   return "$?"
 )
 
 assert_not_empty() (
-  actual=$1
-  msg="${2-}"
-
-  assert_not_eq "" "$actual" "$msg"
+  assert_not_eq "" "$@"
   return "$?"
 )
 
@@ -163,6 +171,8 @@ assert_contain() (
   haystack="$1"
   needle="${2-}"
   msg="${3-}"
+  label="${3-}"
+  msg="${4-doesn\'t contain}"
 
   if [ -z "${needle:+x}" ]; then
     return 0;
@@ -174,16 +184,19 @@ assert_contain() (
 
   if [ -z "${haystack##*"$needle"*}" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$haystack doesn't contain $needle :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$haystack'${nl}${nl}${msg}${nl}${nl}'$needle'" || true
+  fi
+  return 1
 )
 
 assert_not_contain() (
   haystack="$1"
   needle="${2-}"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-contains}"
 
   if [ -z "${needle:+x}" ]; then
     return 0;
@@ -195,60 +208,75 @@ assert_not_contain() (
 
   if [ "${haystack##*"$needle"*}" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$haystack contains $needle :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$haystack'${nl}${nl}${msg}${nl}${nl}'$needle'" || true
+  fi
+  return 1
 )
 
 assert_gt() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4->}"
 
   if [ "$first" -gt  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first > $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_ge() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4->=}"
 
   if [ "$first" -ge  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first >= $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_lt() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-<}"
 
   if [ "$first" -lt  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first < $second :: $msg" || true
-    return 1
   fi
+
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
+  fi
+  return 1
 )
 
 assert_le() (
   first="$1"
   second="$2"
-  msg="${3-}"
+  label="${3-}"
+  msg="${4-<=}"
 
   if [ "$first" -le  "$second" ]; then
     return 0
-  else
-    [ "${#msg}" -gt 0 ] && log_failure "$first <= $second :: $msg" || true
-    return 1
   fi
+  if [ "${#label}" -gt 0 ]; then
+    [ "${label}" = "--" ] && label=""
+    log_failure "${label:+${label}:${nl}${nl}}'$first'${nl}${nl}${msg}${nl}${nl}'$second'" || true
+  fi
+  return 1
 )
